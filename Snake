@@ -1,0 +1,249 @@
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.util.LinkedList;
+import java.util.Random;
+import javax.swing.*;
+
+/** 
+ * This class represents the snake in the game and it also 
+ * includes all food methods for the time being.
+ * 
+ * TODO: Flytta ut food till en egen klass om det behövs.
+ * TODO: Flytta ut score till en egen klass om det behövs.
+ *
+ * @author
+ *
+ */
+public class Snake 
+{
+    private LinkedList<Point> snake;
+    private Direction direction;
+    
+    private Point food;
+    
+    private int score;
+    private int highScore; //TODO: Fixa HighScore så att det kan sparas och läsas från en fil.
+    
+    private int xLeftLimit;
+    private int xRightLimit;
+    private int yTopLimit;
+    private int yLowLimit;
+    private int gridA; //Lättare att hålla koll på vart saker placeras ut.
+    
+    private boolean gameOn = true;
+    
+    
+    /**
+     * 
+     */
+    public Snake(int xLeftPos, int yTopPos, int xRightPos, int yLowPos, int gridArea)
+    {
+        //snake stands still
+        direction = Direction.UNINITIALIZED;
+        
+        //Set limits
+        xLeftLimit = xLeftPos;
+        xRightLimit = (xRightPos + xLeftPos);
+        yTopLimit = yTopPos;
+        yLowLimit = (yLowPos + yTopPos);
+        gridA = gridArea;
+        
+        //Create a snake with x parts.
+        snake = new LinkedList<Point>();
+        createSnake(3);
+        
+        //crate food
+        generateFood();
+        
+        //reset score
+        score = 0;
+    }
+    
+    /**
+     * Create a snake with x parts.
+     */
+    private void createSnake(int parts)
+    { 
+    	snake.clear();
+        for(int i=0; i<parts; i++){
+            snake.add(new Point((280+(gridA*i)), xRightLimit/2));
+        }
+    }
+    
+    /**
+     * Draw a snake on the canvas.
+     */
+    public void drawSnake(Graphics2D g)
+    {
+    	//TODO göra en snyggare orm?
+    	
+    	g.setColor(Color.red);
+        for(Point p : snake)
+        {
+        	g.fillRect(p.x, p.y, gridA, gridA);
+        	g.setColor(Color.DARK_GRAY);
+        }
+    	g.setColor(Color.BLACK);
+    }
+
+    /**
+     * Change direction of the snake.
+     * @param changeD
+     */
+    public void changeDirection(Direction changeD)
+    {
+        direction = changeD;
+    }
+    
+    /**
+     * Move the snake.
+     */
+    public void move() 
+    {
+        Point head = snake.peek();
+        Point nextPoint = head;
+        switch (direction) {
+            case UNINITIALIZED:
+                return;
+            case WEST:
+            	nextPoint = new Point(head.x - gridA, head.y);
+                break;
+            case NORTH:
+                nextPoint = new Point(head.x, head.y - gridA);
+                break;
+            case EAST:
+                nextPoint = new Point(head.x + gridA, head.y);
+                break;
+            case SOUTH:
+                nextPoint = new Point(head.x, head.y + gridA);
+                break;
+        }
+        //remove tail
+        snake.removeLast();
+        
+        //check if out of bounds or if there is food on current cordinate.
+        if(nextPoint.x < xLeftLimit || nextPoint.x >= xRightLimit) {
+            //TODO GAME OVER
+        	gameOn = false;
+            System.out.println("x == OOB");
+            JOptionPane.showMessageDialog(null, "Game over!");
+            //System.exit(0);
+        }else if(nextPoint.y < yTopLimit || nextPoint.y >= yLowLimit ) {
+            //TODO GAME OVER
+        	gameOn = false;
+            System.out.println("y == OOB");
+            JOptionPane.showMessageDialog(null, "Game over!");
+            //System.exit(0);
+        }else if(snake.contains(nextPoint)) {
+            //TODO GAME OVER
+        	gameOn = false;
+        	System.out.println("Snake SMASH");
+        	JOptionPane.showMessageDialog(null, "Game over!");
+        	//System.exit(0);
+        }else if(nextPoint.equals(food)) {
+        	eat();
+        	generateFood();
+        }
+        snake.push(nextPoint); 
+    }
+    
+    /**
+     * return the direction of the snake.
+     */
+    public Direction getDirection()
+    {
+    	return direction;
+    }
+    
+    /**
+     * kill the snake?
+     * 
+     * @param gameReallyOn
+     */
+    public boolean getGameOn()
+    {
+    	return gameOn;
+    }
+    
+    
+    
+    
+    
+    
+    /**
+     * Generate new foodpoints if the foodpoint was eaten by
+     * the snake. If the new randomized point is inside the snake
+     * a new point will be generated.
+     */
+    private void generateFood()
+    {
+    	int xRight = xRightLimit/gridA;
+    	int xLeft = xLeftLimit/gridA;
+    	int yLow = yLowLimit/gridA;
+    	int yTop = yTopLimit/gridA;
+    	
+    	Random rand = new Random();
+    	int randX = (rand.nextInt(xRight - xLeft) + xLeft) * gridA;
+    	int randY = (rand.nextInt(yLow - yTop) + yTop) * gridA;
+    	Point nextPoint = new Point(randX, randY);
+    	//check if the new generated point is in the snake
+    	while(snake.contains(nextPoint))
+    	{
+    		randX = (rand.nextInt(xRight - xLeft) + xLeft) * gridA;
+        	randY = (rand.nextInt(yLow - yTop) + yTop) * gridA;
+    		nextPoint = new Point(randX, randY);
+    	}
+    	food = nextPoint;
+    }
+    
+    /**
+     * eat food and grow
+     */
+    private void eat()
+    {
+    	snake.addLast(food.getLocation());
+    	incrementScore(10);
+    }
+    
+    /**
+     * Draw a foodpoint on the canvas.
+     */
+    public void drawFood(Graphics2D g)
+    {
+    	//TODO rita snyggare mat?
+    	g.setColor(Color.green);
+        g.fillOval(food.x, food.y, gridA, gridA);
+    	g.setColor(Color.BLACK);
+    }
+    
+    
+    
+    
+    /**
+     * Draw score on canvas.
+     * @param g
+     */
+    public void drawScore(Graphics2D g)
+    {
+    	g.drawString("Your Score: " + score, xLeftLimit, yTopLimit-gridA);
+    	g.drawString("Highscore: " + highScore, xLeftLimit+12*gridA, yTopLimit-gridA);
+    }
+    
+    /**
+     * increment score.
+     */
+    public void incrementScore(int plus)
+    {
+    	score += plus;
+    }
+    
+    /**
+     * return score
+     */
+    public int getScore()
+    { 
+    	return score;
+    }
+}
