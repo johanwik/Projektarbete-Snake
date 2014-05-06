@@ -1,0 +1,92 @@
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+
+public class SnakeMain implements KeyListener {
+
+	private CanvasSnake myCanvas;
+    private Room room;
+    private Snake snake;
+    private boolean isAlive;
+    
+	
+    /**
+     * Start application
+     * 
+     * @param args
+     */
+	//public static void main(String[] args) {
+		//SnakeMain main = new SnakeMain();
+	//}
+	
+	/**
+     * Create a SnakeMain object. Create a snake and a room and paints it 
+     * in the CanvasSnake class.
+     */
+    public SnakeMain(int speed)
+    {
+    	//Create a mew snake
+        snake = new Snake(50,50,510,400,10);
+        
+      //Create a new room
+        room = new Room(50,50,510,400,10,600,500);
+        
+        //Create Canvas
+        myCanvas = new CanvasSnake("Snake Demo", 600, 500, snake, room, speed);
+        myCanvas.setVisible(true);
+        myCanvas.AddKeyListener(this);
+       
+        
+    }
+		
+	/**
+	 * check input from keyboard.
+	 * 
+     * @param 
+     */
+    @Override
+    public void keyPressed(KeyEvent e) {
+        switch (e.getKeyCode())
+        {
+            case KeyEvent.VK_LEFT:
+                if(snake.getDirection() != Direction.EAST) {
+            	snake.changeDirection(Direction.WEST);
+                }
+                break;
+            case KeyEvent.VK_UP:
+            	if(snake.getDirection() != Direction.SOUTH) {
+            	snake.changeDirection(Direction.NORTH);
+            	}
+                break;
+            case KeyEvent.VK_RIGHT:
+            	if(snake.getDirection() != Direction.WEST) {
+            	snake.changeDirection(Direction.EAST);
+            	}
+                break;
+            case KeyEvent.VK_DOWN:
+            	if(snake.getDirection() != Direction.NORTH) {
+            	snake.changeDirection(Direction.SOUTH);
+            	}
+                break;  
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        // TODO Auto-generated method stub
+       
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        // TODO Auto-generated method stub
+       
+    }   
+    
+    public int getHighScore(){
+    	return snake.getScore();
+    	
+    }
+
+}
