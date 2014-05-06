@@ -1,0 +1,44 @@
+import java.awt.*;
+
+
+/**
+ * 
+ * @author 
+ * @version 
+ */
+public class Room
+{    
+    //position of room
+    private int xLeft;
+    private int xRight;
+    private int yTop;
+    private int yLow;
+    private int backGroundW;
+    private int backGroundH;
+    
+    
+    /**
+     * Constructor for objects of class Room
+     */
+    public Room(int xLeftPos, int yTopPos, int xRightPos, int yLowPos, int gridArea, int bgW, int bgH)
+    {
+    	//save positions
+        xLeft = xLeftPos;
+        yTop = yTopPos;
+        xRight = xRightPos;
+        yLow = yLowPos;
+        backGroundW = bgW;
+        backGroundH = bgH;
+    }
+    
+    /**
+     * Create room with the given size and draws it to the canvas.
+     */
+    public void createRoom(Graphics2D g)
+    {
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, backGroundW, backGroundH);
+        g.setColor(Color.BLACK);
+    	g.drawRect(xLeft, yTop, xRight, yLow);
+    }
+}
