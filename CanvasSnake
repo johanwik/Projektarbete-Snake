@@ -1,0 +1,164 @@
+import javax.swing.*;
+
+import java.awt.*;
+
+/**
+ * Class CanvasSnake - a class to allow for simple graphical 
+ * drawing on a canvas.
+ * 
+ * @author 
+ * @version 
+ */
+public class CanvasSnake 
+{
+    private JFrame frame;
+    private CanvasPane canvas;
+    private Color backgroundColor;
+    private Image canvasImage;
+    private Graphics2D graphic;
+    private Graphics globalGraphics;
+    private Thread runThread;
+    private Snake snake;
+    private Room room;
+    boolean gameOn;
+    private int speed;
+     
+    
+    /**
+     * Create a Canvas with default background color (white).
+     * @param title  title to appear in Canvas Frame
+     * @param width  the desired width for the canvas
+     * @param height  the desired height for the canvas
+     */
+    public CanvasSnake(String title, int width, int height, Snake _snake, Room _room, int _speed)
+    {
+        this(title, width, height, Color.white,_snake, _room, _speed);
+    }
+    
+    /**
+     * Create a Canvas.
+     * @param title  title to appear in Canvas Frame
+     * @param width  the desired width for the canvas
+     * @param height  the desired height for the canvas
+     * @param bgClour  the desired background color of the canvas
+     */
+    private CanvasSnake(String title, int width, int height, Color bgColor, Snake _snake, Room _room, int _speed)
+    {
+    	speed = _speed;
+    	snake = _snake;
+    	room = _room;
+        frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        canvas = new CanvasPane();
+        frame.setContentPane(canvas);
+        frame.setTitle(title);
+        canvas.setPreferredSize(new Dimension(width, height));
+        backgroundColor = bgColor;
+        frame.pack();
+    }
+    
+    /**
+     * Draw the outline of a given shape onto the canvas.
+     * @param  shape  the shape object to be drawn on the canvas
+     */
+    public void draw(Shape shape)
+    {
+        graphic.draw(shape);
+        canvas.repaint();
+    }
+    
+    /**
+     * Set the canvas visibility and brings canvas to the front of screen
+     * when made visible. This method can also be used to bring an already
+     * visible canvas to the front of other windows.
+     * @param visible  boolean value representing the desired visibility of
+     * the canvas (true or false) 
+     */
+    public void setVisible(boolean visible)
+    {
+        if(graphic == null) {
+            // first time: instantiate the offscreen image and fill it with
+            // the background color
+            Dimension size = canvas.getSize();
+            canvasImage = canvas.createImage(size.width, size.height);
+            graphic = (Graphics2D)canvasImage.getGraphics();
+            graphic.setColor(backgroundColor);
+            graphic.fillRect(0, 0, size.width, size.height);
+            graphic.setColor(Color.black);
+        }
+        frame.show();
+        //place the frame at the center of the screen and show
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation(d.width/2 - frame.getWidth()/2, d.height/2 - frame.getHeight()/2);
+        frame.setVisible(true);
+    }
+    
+    public void AddKeyListener(SnakeMain arg0) {
+    	frame.addKeyListener(arg0);
+    }
+   
+    public boolean stillPlaying()
+    {
+    return gameOn;	
+    
+    }
+    /************************************************************************
+     * Inner class CanvasPane - the actual canvas component contained in the
+     * Canvas frame. This is essentially a JPanel with added capability to
+     * refresh the image drawn on it.
+     */
+   
+    private class CanvasPane extends JPanel implements Runnable
+    {
+        public void paint(Graphics g)
+        {
+            g.drawImage(canvasImage, 0, 0, null);
+            globalGraphics = g.create();
+            //System.out.println("paint");
+            if (runThread == null) {
+            	runThread = new Thread(this);
+            	runThread.start();
+            }
+            
+          
+        }
+        
+        
+        @Override
+    	public void run() {
+        	gameOn = true;
+    		while (gameOn) {
+    			snake.move();
+    			gameOn = snake.getGameOn();
+    			
+    			if(!gameOn)
+    			{
+    				frame.dispose();
+
+    			}
+    			
+    			if(gameOn)
+    			{
+    				//draw room
+    				room.createRoom(graphic);
+    				//draw snake
+    				snake.drawSnake(graphic);
+    				//draw food
+    				snake.drawFood(graphic);
+    				//draw score
+    				snake.drawScore(graphic);
+    				//update canvas
+    				canvas.repaint();
+    				try {
+    					Thread.currentThread();
+    					//game speed
+    					Thread.sleep(speed);
+    			    } catch (Exception e) 
+    			    {
+    			    
+    			    }
+    			}	
+    		}
+        }
+    }	
+}
