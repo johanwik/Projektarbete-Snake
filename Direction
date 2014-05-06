@@ -1,0 +1,9 @@
+/**
+ * Representations for all the valid directions in the game.
+ * 
+ * @author
+ *
+ */
+public enum Direction {
+	WEST, NORTH, EAST, SOUTH, UNINITIALIZED;
+}
