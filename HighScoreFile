@@ -1,0 +1,149 @@
+import java.io.*;
+
+//import java.util.StringTokenizer;
+
+
+public class HighScoreFile {
+    //private String file;
+    private String name;
+    private int highScore;
+    private String[] highScoreArray;
+    public static void main(String[] args) {
+        
+        new HighScoreFile();
+    }
+
+    public HighScoreFile(){
+        highScoreArray = new String[10];
+
+        //readFile();
+        //writeToFile();
+
+    }
+
+    public String[] readFile(){
+        String line; //sträng med lästa texten
+        //StringTokenizer st;
+        BufferedReader file;
+        int i = 0;
+        try {			
+            //System.out.println("test");
+            file = new BufferedReader(new FileReader("C:/Documents and Settings/snakeHighScore.txt"));
+            while((line = file.readLine()) != null){ 
+                if(line.equals("")){
+                }
+                else if(line.charAt(0) == '/') {
+                }
+                else {
+                    //st = new StringTokenizer(line);
+
+                    //String a = st.nextToken();
+                    //int b = Integer.parseInt(st.nextToken());
+                    //String s = a + " "+ b;
+                    if(i < 10){
+                        highScoreArray[i] = line; 
+                    }
+                    //System.out.println(line);
+                    i++;
+                    //break;
+                }      
+            }
+            file.close();
+
+        }
+        catch (FileNotFoundException e){
+
+            System.err.println("Filen hittades inte");
+        }
+        catch (IOException e) {
+            System.err.println("Ett fel uppstod.");
+        }
+
+        return highScoreArray; 
+    }
+
+    public void writeToFile(String newName, int score){
+
+        name = newName;
+        highScore = score;
+        try {
+            //What ever the file path is.
+            File newFile = new File("C:/Documents and Settings/snakeHighScore.txt");
+            FileOutputStream is = new FileOutputStream(newFile);
+            OutputStreamWriter osw = new OutputStreamWriter(is);    
+            Writer w = new BufferedWriter(osw);
+            boolean notAdded = true;
+            for(int i = 0; i < highScoreArray.length; i++){
+                if(highScoreArray[i] != null){
+                    String[] high = highScoreArray[i].split(" ");
+                    int h = Integer.parseInt(high[1]);
+                    if (h <= highScore && notAdded){
+                        w.write(name + " " + highScore);
+                        w.write(System.getProperty("line.separator"));
+                        notAdded = false;
+                    }	
+                    w.write(highScoreArray[i]);
+                    w.write(System.getProperty("line.separator"));
+
+                }
+            }
+            if(notAdded){
+                w.write(name + " " + highScore);
+                w.write(System.getProperty("line.separator"));
+            }
+            w.close();
+        } catch (IOException e) {
+            System.err.println("Problem writing to the file snakeHighScore.txt");
+        }
+
+    }
+
+    public String[] getHighScoreArray(){
+        return highScoreArray;
+    }
+
+    public String getHighScore(){
+
+        if(highScoreArray[0] != null)
+            return highScoreArray[0];
+        else{
+            return "No previous high score ";
+        }
+
+    }
+
+    public int getHighScoreInt(int index){
+
+        if(highScoreArray[index] != null){
+            String[] high = highScoreArray[index].split(" ");
+            int h = Integer.parseInt(high[1]);
+            return h;  
+        }
+        else{
+            return 0;
+        }
+
+    }
+
+    public void printHighScoreArray(){
+        System.out.println("High score");
+        for(int i = 0; i < highScoreArray.length; i++){
+            if(highScoreArray[i] != null)
+                System.out.println((i + 1) + ". "+ highScoreArray[i]);
+
+        }
+    }
+
+    public String stringHighScoreArray(){
+        String s;
+        s = "High score \n~~~~~~~~~~~~~~~~~~~~";
+        for(int i = 0; i < highScoreArray.length; i++){
+            if(highScoreArray[i] != null)
+
+                s += ("\n" +  (i + 1) + ". "+ highScoreArray[i] );
+
+        }
+        return s + "\n~~~~~~~~~~~~~~~~~~~~";
+    }
+
+}
