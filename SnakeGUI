@@ -1,217 +1,222 @@
-	import java.awt.*;
-	import java.awt.event.*;
-	import javax.swing.*;
-	import javax.swing.border.*;
-	import java.util.ArrayList;
-	//import java.util.Arrays;
+import java.awt.*;
+import java.awt.event.*;
 
-	public class SnakeGUI {
-		private JFrame frame;
-		private SnakeMain snake;
-		private ArrayList<Integer> highScoreList ;
-		
-		
-		public static void main(String[] args) {
-			new SnakeGUI();
-		}
-		public SnakeGUI(){
-			makeFrame();
-			highScoreList = new ArrayList<Integer>();
-		}
-		/**
-	     * Start function: Starts the game.
-	     */
-	    private void startGame()
-	    {
-	    	int go = 0;
-	    	//JOptionPane.showMessageDialog(frame, "hej");
-	    	//while(go==0){
-	    	String[] options = new String[] {"Easy", "Medium", "Hard"};
-	        int response = JOptionPane.showOptionDialog(frame, "Choose difficulty", "Difficulty",
-	            JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
-	            null, options, options[0]);
-	  
-	        if(response == 0){
-	        	//easy
-	        	JOptionPane.showMessageDialog(frame, "You choosed easy");
+import javax.swing.*;
+import javax.swing.border.*;
+//import java.util.ArrayList;
+//import java.util.Arrays;
 
-	        	snake = new SnakeMain(400);
-	        	
-	        	
-	        	//JOptionPane.showMessageDialog(frame, "Game Over NOOB!!");
-	        	//play(easy/0); - ta en parameter som bestämemer starthastighet
-	        }
-	        	//medium
-	        else if (response == 1){
-	        	JOptionPane.showMessageDialog(frame, "You choosed medium");
-	        	snake = new SnakeMain(100);	
-	        	//JOptionPane.showMessageDialog(frame, "Game Over!!");
-	        	}
-	        	//hard
-	        else if (response == 2){
-	        	JOptionPane.showMessageDialog(frame, "You choosed hard");
-	        	snake = new SnakeMain(10);
-	        	//JOptionPane.showMessageDialog(frame, "Game Over wannabe pro = nooB!!");
-	        }
-	        	//if exit
-	        else{
-	        	JOptionPane.showMessageDialog(frame, "error/exit game", "error", JOptionPane.ERROR_MESSAGE);
-	        	}
-	       // go = JOptionPane.showOptionDialog(frame, "Play again?", "Play",
-	         //       JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-	           //     null, null, null);
-	        //}
-	        
-	    }
-	    
-		/**
-	     * Start function: Starts the game.
-	     */
-	    private void infoGame()
-	    {
-	    	JOptionPane.showMessageDialog(frame, "spelregler");
-	    	JOptionPane.showMessageDialog(frame, "Styr ormen och eat apples");
-	    	//frame.pack();
-	    }
-	    
-		/**
-	     * Highscore function: Give information about highscore.
-	     */
-	    private void highScore()
-	    {
-	    	
-	    	highScoreList.add((Integer)snake.getHighScore());
-	    	System.out.println(highScoreList.size());
-	    	for(Integer score: highScoreList){
-	    		System.out.println("High Score = " + score);
-	    		
-	    	}
-	    	
-	    	if(highScoreList.isEmpty())
-	    	JOptionPane.showMessageDialog(frame, "Inga highscore än ");
-	    	//frame.pack();
-	    }    
-	    
-	    /**
-	     * Quit function: quit the application.
-	     */
-	    private void quit()
-	    {
-	        System.exit(0);
-	    }
-	    
-	    // ---- swing stuff to build the frame and all its components ----
-	    
-	    /**
-	     * Create the Swing frame and its content.
-	     */
-	    private void makeFrame()
-	    {
-	        frame = new JFrame("Snake");
-	        makeMenuBar(frame);
-	       
-	        
-	        //Container contentPane = frame.getContentPane();
-	        //add buttons
-	        JPanel contentPane = (JPanel)frame.getContentPane();
-	        contentPane.setLayout(new BorderLayout());
-	        contentPane.setBorder(new EmptyBorder(12, 12, 12, 12)); //add space from the walls
-	
-	        JLabel fileNameLabel = new JLabel("~~~~~~Snake~~~~~~");
-	        contentPane.add(fileNameLabel, BorderLayout.NORTH);
-	     
-	        JPanel buttons = new JPanel(); //för neslade knappar
-	        //buttons.setBorder(new EmptyBorder(12, 12, 12, 12));
-	        buttons.setLayout(new GridLayout(0, 1));
-	        
-	        //start
-	        JButton startButton = new JButton("Play Game");
-	        startButton.addActionListener(new ActionListener() {
-	            public void actionPerformed(ActionEvent e) { startGame(); }
-	        });
-	        buttons.add(startButton);
-	        
-	        //info about the game
-	        JButton infoButton = new JButton("Instructions");
-	        infoButton.addActionListener(new ActionListener() {
-	            public void actionPerformed(ActionEvent e) { infoGame(); }
-	        });
-	        buttons.add(infoButton);
-	        
-	        //button for highscore
-	        JButton highScoreButton = new JButton("High Score");
-	        highScoreButton.addActionListener(new ActionListener() {
-	            public void actionPerformed(ActionEvent e) { highScore(); }
-	        });
-	        buttons.add(highScoreButton);
-	        
-	        //short info about the game and the creators
-	        JButton aboutButton = new JButton("About");
-	        aboutButton.addActionListener(new ActionListener() {
-	            public void actionPerformed(ActionEvent e) { JOptionPane.showMessageDialog(frame, "Johans och Christofers Snake-spel"); }
-	        });
-	        buttons.add(aboutButton);
-	        
-	        //quit game
-	        JButton quitButton = new JButton("Quit Game");
-	        quitButton.addActionListener(new ActionListener() {
-	            public void actionPerformed(ActionEvent e) { quit(); }
-	        });
-	        buttons.add(quitButton);
-	        
-	        
-	        //button in the center
-	        contentPane.add(buttons, BorderLayout.CENTER); //WEST an alternative
-	        
+public class SnakeGUI {
+    private JFrame frame;
+    private SnakeMain snake;
+    private String[] highScoreArray;
+    private HighScoreFile highScore;
+ 
 
+    public static void main(String[] args) {
+        new SnakeGUI();
+    }
 
-	        //status label
-	        JLabel statusLabel = new JLabel("version 1.0");
-	        contentPane.add(statusLabel, BorderLayout.SOUTH);
-	        
-	        
-	        
-	        // building is done - arrange the components and show        
-	        frame.pack();
-	        frame.setVisible(true);
-	        
-	        //place the frame at the center of the screen and show
-	        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-	        frame.setLocation(d.width/2 - frame.getWidth()/2, d.height/2 - frame.getHeight()/2);
-	        frame.setVisible(true);
-	    }    
-	    
-	    /**
-	     * Create the main frame's menu bar.
-	     * @param frame   The frame that the menu bar should be added to.
-	     */
-	    private void makeMenuBar(JFrame frame)
-	    {
-	        final int SHORTCUT_MASK =
-	            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-	
-	
-	        JMenuBar menubar = new JMenuBar();
-	        frame.setJMenuBar(menubar);
-	        
-	        // create the File manu
-	        JMenu fileMenu = new JMenu("File");
-	        menubar.add(fileMenu);
-	        
-	        JMenuItem GameItem = new JMenuItem("New Game");
-	            GameItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, SHORTCUT_MASK));
-	            GameItem.addActionListener(new ActionListener() {
-	                               public void actionPerformed(ActionEvent e) { startGame(); }
-	                           });
-	        fileMenu.add(GameItem);
-	
-	        JMenuItem quitItem = new JMenuItem("Quit");
-	            quitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, SHORTCUT_MASK));
-	            quitItem.addActionListener(new ActionListener() {
-	                               public void actionPerformed(ActionEvent e) { quit(); }
-	                           });
-	        fileMenu.add(quitItem);
-	
-	    }
-	}
+    public SnakeGUI(){
+        makeFrame();
+        //highScoreList = new ArrayList<Integer>();
+        highScore = new HighScoreFile();
+        highScoreArray = highScore.readFile();
 
+    }
+
+    /**
+     * Start function: Starts the game.
+     */
+    private void startGame()
+    {
+
+        String[] options = new String[] {"Easy", "Medium", "Hard"};
+        int response = JOptionPane.showOptionDialog(frame, "Choose difficulty", "Difficulty",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, options, options[0]);
+
+        if(response == 0){
+            //easy
+            //JOptionPane.showMessageDialog(frame, "You choosed easy");
+
+            snake = new SnakeMain(200);
+
+    
+        }
+        //medium
+        else if (response == 1){
+            //JOptionPane.showMessageDialog(frame, "You choosed medium");
+            snake = new SnakeMain(80);
+            //JOptionPane.showMessageDialog(frame, "Game Over!!");
+        }
+        //hard
+        else if (response == 2){
+            //JOptionPane.showMessageDialog(frame, "You choosed hard");
+            snake = new SnakeMain(20);
+            //JOptionPane.showMessageDialog(frame, "Game Over wannabe pro = nooB!!");
+        }
+        //if exit
+        else{
+            JOptionPane.showMessageDialog(frame, "error/exit game", "error", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }
+
+    /**
+     * Start function: Starts the game.
+     */
+    private void infoGame()
+
+    {	String howToPlay = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+    		+ "~To start the game you click on the Play Game Button. "
+            + "\n~Then choose the difficulty you want which determines the speed of the snake."
+            + "\n~The game will then start when you push one of the arrow keys."
+            + "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+        String gameRules = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+        		+ "~You steer the snake with the arrow keys."
+            + "\n~press the up-key and the snake will go north."
+            + "\n~press the down-key and the snake will go south."
+            + "\n~press the left-key and the snake will go west."
+            + "\n~press the right-key and the snake will go east."
+            + "\n~Your goal is to eat the green apples that will randomly appear on the screen."
+            + "\n~If you eat an apple you will get some points, a new apple will appear and the snake will grow."
+            + "\n~You lose the game if you hit the wall or hit a part of the snake's tail."
+            + "\n~Try to get the highest score possible and enter the high score list"
+            + "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+
+        JOptionPane.showMessageDialog(frame, howToPlay, "How to play", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(frame, gameRules, "Game rules", JOptionPane.INFORMATION_MESSAGE);
+        //frame.pack();
+    }
+
+    /**
+     * Highscore function: Give information about highscore.
+     */
+    private void highScore()
+    {
+        highScore.readFile();
+        //highScore.printHighScoreArray();
+
+        //String s = "     ________________________/ O  \\___/";
+        //String s2 = "\n <%%%%%%%%%%%%%%%%%%%%%%%%_____/   \\";
+        //JOptionPane.showMessageDialog(frame, s + s2);
+        JOptionPane.showMessageDialog(frame,  highScore.stringHighScoreArray() , "High score", JOptionPane.PLAIN_MESSAGE);
+        //frame.pack();
+    }
+
+    /**
+     * Quit function: quit the application.
+     */
+    private void quit()
+    {
+        System.exit(0);
+    }
+
+    // ---- swing stuff to build the frame and all its components ----
+
+    /**
+     * Create the Swing frame and its content.
+     */
+    private void makeFrame()
+    {
+        frame = new JFrame("Snake");
+        makeMenuBar(frame);
+
+        //Container contentPane = frame.getContentPane();
+        //add buttons
+        JPanel contentPane = (JPanel)frame.getContentPane();
+        contentPane.setLayout(new BorderLayout());
+        contentPane.setBorder(new EmptyBorder(12, 12, 12, 12)); //add space from the walls
+
+        JLabel fileNameLabel = new JLabel("~~~~~~Snake~~~~~~");
+        contentPane.add(fileNameLabel, BorderLayout.NORTH);
+
+        JPanel buttons = new JPanel(); //för neslade knappar
+        //buttons.setBorder(new EmptyBorder(12, 12, 12, 12));
+        buttons.setLayout(new GridLayout(0, 1));
+
+        //start
+        JButton startButton = new JButton("Play Game");
+        startButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) { startGame(); }
+            });
+        buttons.add(startButton);
+
+        //info about the game
+        JButton infoButton = new JButton("How To Play");
+        infoButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) { infoGame(); }
+            });
+        buttons.add(infoButton);
+
+        //button for highscore
+        JButton highScoreButton = new JButton("High Score");
+        highScoreButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) { highScore(); }
+            });
+        buttons.add(highScoreButton);
+
+        //short info about the game and the creators
+        JButton aboutButton = new JButton("About");
+        aboutButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) { JOptionPane.showMessageDialog(frame, "Johans och Christofers Snake-spel");}
+            });
+        buttons.add(aboutButton);
+
+        //quit game
+        JButton quitButton = new JButton("Quit Game");
+        quitButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) { quit(); }
+            });
+        buttons.add(quitButton);
+
+        //button in the center
+        contentPane.add(buttons, BorderLayout.CENTER); //WEST an alternative
+
+        //status label
+        JLabel statusLabel = new JLabel("version 1.0");
+        contentPane.add(statusLabel, BorderLayout.SOUTH);
+
+        // building is done - arrange the components and show
+        frame.pack();
+        frame.setVisible(true);
+
+        //place the frame at the center of the screen and show
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation(d.width/2 - frame.getWidth()/2, d.height/2 - frame.getHeight()/2);
+        frame.setVisible(true);
+    }
+
+    /**
+     * Create the main frame's menu bar.
+     * @param frame The frame that the menu bar should be added to.
+     */
+    private void makeMenuBar(JFrame frame)
+    {
+        final int SHORTCUT_MASK =
+            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+
+        JMenuBar menubar = new JMenuBar();
+        frame.setJMenuBar(menubar);
+
+        // create the File manu
+        JMenu fileMenu = new JMenu("File");
+        menubar.add(fileMenu);
+
+        JMenuItem GameItem = new JMenuItem("New Game");
+        GameItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, SHORTCUT_MASK));
+        GameItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) { startGame(); }
+            });
+        fileMenu.add(GameItem);
+
+        JMenuItem quitItem = new JMenuItem("Quit");
+        quitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, SHORTCUT_MASK));
+        quitItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) { quit(); }
+            });
+        fileMenu.add(quitItem);
+
+    }
+}
