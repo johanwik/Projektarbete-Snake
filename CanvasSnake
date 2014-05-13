@@ -16,12 +16,22 @@ public class CanvasSnake
     private Color backgroundColor;
     private Image canvasImage;
     private Graphics2D graphic;
-    private Graphics globalGraphics;
     private Thread runThread;
     private Snake snake;
     private Room room;
     boolean gameOn;
     private int speed;
+    
+    private Image ball;
+    private Image leftHead;
+    private Image upHead;
+    private Image rightHead;
+    private Image downHead;
+    private Image food;
+    private Image ground;
+
+    
+    
      
     
     /**
@@ -54,7 +64,9 @@ public class CanvasSnake
         frame.setTitle(title);
         canvas.setPreferredSize(new Dimension(width, height));
         backgroundColor = bgColor;
+        loadImages();
         frame.pack();
+        
     }
     
     /**
@@ -96,6 +108,33 @@ public class CanvasSnake
     public void AddKeyListener(SnakeMain arg0) {
     	frame.addKeyListener(arg0);
     }
+    
+    private void loadImages()
+    {
+    	ImageIcon snakeBody = new ImageIcon("body.png");
+    	ball = snakeBody.getImage();
+    	
+    	ImageIcon snakeLeftHead = new ImageIcon("head-left.png");
+    	leftHead = snakeLeftHead.getImage();
+    	
+    	ImageIcon snakeUpHead = new ImageIcon("head-up.png");
+    	upHead = snakeUpHead.getImage();
+    	
+    	ImageIcon snakeRightHead = new ImageIcon("head-right.png");
+    	rightHead = snakeRightHead.getImage();
+    	
+    	ImageIcon snakeDownHead = new ImageIcon("head-down.png");
+    	downHead = snakeDownHead.getImage();
+    	
+    	ImageIcon snakeFood = new ImageIcon("food.png");
+    	food = snakeFood.getImage();
+    	
+    	ImageIcon roomGround = new ImageIcon("texture.png");
+    	ground = roomGround.getImage();
+    	
+    	
+    }
+
    
     public boolean stillPlaying()
     {
@@ -113,8 +152,6 @@ public class CanvasSnake
         public void paint(Graphics g)
         {
             g.drawImage(canvasImage, 0, 0, null);
-            globalGraphics = g.create();
-            //System.out.println("paint");
             if (runThread == null) {
             	runThread = new Thread(this);
             	runThread.start();
@@ -134,17 +171,18 @@ public class CanvasSnake
     			if(!gameOn)
     			{
     				frame.dispose();
-
     			}
-    			
     			if(gameOn)
     			{
     				//draw room
-    				room.createRoom(graphic);
+    				room.createRoom(graphic, ground);
     				//draw snake
-    				snake.drawSnake(graphic);
+    				snake.snakeDraw(graphic, ball, leftHead, upHead, rightHead, downHead);
+    				//snake.drawSnake(graphic);
+    				
     				//draw food
-    				snake.drawFood(graphic);
+    				snake.foodDraw(graphic, food);
+    				//snake.drawFood(graphic);
     				//draw score
     				snake.drawScore(graphic);
     				//update canvas
