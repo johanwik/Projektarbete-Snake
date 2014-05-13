@@ -34,11 +34,13 @@ public class Room
     /**
      * Create room with the given size and draws it to the canvas.
      */
-    public void createRoom(Graphics2D g)
+    public void createRoom(Graphics2D g, Image ground)
     {
-        g.setColor(Color.WHITE);
-        g.fillRect(0, 0, backGroundW, backGroundH);
         g.setColor(Color.BLACK);
-    	g.drawRect(xLeft, yTop, xRight, yLow);
+        g.fillRect(0, 0, backGroundW, backGroundH);
+        g.setColor(Color.WHITE);
+        g.drawImage(ground, xLeft, yTop, xRight, yLow, null);
+        g.drawRect(xLeft, yTop, xRight, yLow);
     }
+
 }
