@@ -2,94 +2,102 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+
 public class SnakeMain implements KeyListener {
-    private CanvasSnake myCanvas;
+
+	private CanvasSnake myCanvas;
     private Room room;
     private Snake snake;
     private boolean isAlive;
-
+    
+	
     /**
      * Start application
-     *
+     * 
      * @param args
      */
-    //public static void main(String[] args) {
-    //SnakeMain main = new SnakeMain();
-    //}
-
-    /**
-     * Create a SnakeMain object. Create a snake and a room and paints it
+	//public static void main(String[] args) {
+		//SnakeMain main = new SnakeMain();
+	//}
+	
+	/**
+     * Create a SnakeMain object. Create a snake and a room and paints it 
      * in the CanvasSnake class.
      */
     public SnakeMain(int speed)
     {
-        play(speed);
-
-    }
-    public boolean play(int speed){
-        //Create a mew snake
-        snake = new Snake(50,50,510,400,10, speed);
-
+    	int change = 40;
+    	
+    	//Create a mew snake
+        snake = new Snake(40,40,1000,520,change, speed);
+        
         //Create a new room
-        room = new Room(50,50,510,400,10,600,500);
-
+        room = new Room(40,40,1000,520,change,1080,600);
+        
         //Create Canvas
-        myCanvas = new CanvasSnake("Snake Demo", 600, 500, snake, room, speed);
+        myCanvas = new CanvasSnake("Snake", 1080, 600, snake, room, speed);
         myCanvas.setVisible(true);
         myCanvas.AddKeyListener(this);
-
-        //snake.getGameOn()){
-
-        return false;
+       
+        
     }
-
-    /**
-     * check input from keyboard.
-     *
-     * @param
+		
+	/**
+	 * check input from keyboard.
+	 * 
+     * @param 
      */
     @Override
     public void keyPressed(KeyEvent e) {
-        switch (e.getKeyCode())
+
+        //om en knapp används kör inte
+    	if(!snake.getKeyDone()) {
+    		return;
+    	}
+    	switch (e.getKeyCode())
         {
             case KeyEvent.VK_LEFT:
-            if(snake.getDirection() != Direction.EAST) {
-                snake.changeDirection(Direction.WEST);
-            }
-            break;
+                if(snake.getDirection() != Direction.EAST) {
+            	snake.changeDirection(Direction.WEST);
+            	snake.setKeyDone(false);
+                }
+                break;
             case KeyEvent.VK_UP:
-            if(snake.getDirection() != Direction.SOUTH) {
-                snake.changeDirection(Direction.NORTH);
-            }
-            break;
+            	if(snake.getDirection() != Direction.SOUTH && snake.getFirstMoveDone()) {
+            	snake.changeDirection(Direction.NORTH);
+            	snake.setKeyDone(false);
+            	}
+                break;
             case KeyEvent.VK_RIGHT:
-            if(snake.getDirection() != Direction.WEST) {
-                snake.changeDirection(Direction.EAST);
-            }
-            break;
+            	if(snake.getDirection() != Direction.WEST) {
+            	snake.changeDirection(Direction.EAST);
+            	snake.setKeyDone(false);
+            	}
+                break;
             case KeyEvent.VK_DOWN:
-            if(snake.getDirection() != Direction.NORTH) {
-                snake.changeDirection(Direction.SOUTH);
-            }
-            break;
+            	if(snake.getDirection() != Direction.NORTH) {
+            	snake.changeDirection(Direction.SOUTH);
+            	snake.setKeyDone(false);
+            	}
+                break;  
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         // TODO Auto-generated method stub
-
+       
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
         // TODO Auto-generated method stub
-
-    }
-
+       
+    }   
+    
     public int getHighScore(){
-        return snake.getScore();
-
+    	return snake.getScore();
+    	
     }
 
 }
