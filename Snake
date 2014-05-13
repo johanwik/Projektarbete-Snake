@@ -1,102 +1,144 @@
+
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.util.LinkedList;
 import java.util.Random;
 
 import javax.swing.*;
 
-/**
- * This class represents the snake in the game and it also
+/** 
+ * This class represents the snake in the game and it also 
  * includes all food methods for the time being.
- *
+ * 
  * TODO: Flytta ut food till en egen klass om det behövs.
  * TODO: Flytta ut score till en egen klass om det behövs.
  *
  * @author
  *
  */
-public class Snake
+public class Snake 
 {
     private LinkedList<Point> snake;
     private Direction direction;
-
+    
     private Point food;
-
+    
     private int score;
     private String highScore; //TODO: Fixa HighScore så att det kan sparas och läsas från en fil.
-
+    
     private int xLeftLimit;
     private int xRightLimit;
     private int yTopLimit;
     private int yLowLimit;
     private int gridA; //Lättare att hålla koll på vart saker placeras ut.
-
+    
     private boolean gameOn = true;
+    private boolean firstMoveDone;
+    private boolean keyDone;
+
     private int snakeSpeed;
 
     private HighScoreFile highScoreFile;
     private String[] highScoreArray;
     /**
-     *
+     * 
      */
     public Snake(int xLeftPos, int yTopPos, int xRightPos, int yLowPos, int gridArea, int speed)
     {
         //snake stands still
         direction = Direction.UNINITIALIZED;
-
+        
         //Set limits
         xLeftLimit = xLeftPos;
         xRightLimit = (xRightPos + xLeftPos);
         yTopLimit = yTopPos;
         yLowLimit = (yLowPos + yTopPos);
         gridA = gridArea;
-
+        
         //Create a snake with x parts.
         snake = new LinkedList<Point>();
         createSnake(3);
-
+        
         //crate food
         generateFood();
-
+        
         //reset score
         score = 0;
-
-        //different speed to adjust how much score one gets.
+        
+        //set keyDone to true
+        keyDone = true;
+        
+      //different speed to adjust how much score one gets.
         snakeSpeed = speed;
 
         //get and adjust high score
         highScoreFile = new HighScoreFile();
         highScoreArray = highScoreFile.readFile();
         highScore = highScoreFile.getHighScore(); 
-    }
 
+    }
+    
     /**
      * Create a snake with x parts.
      */
     private void createSnake(int parts)
-    {
-        snake.clear();
+    { 
+    	snake.clear();
         for(int i=0; i<parts; i++){
-            snake.add(new Point((280+(gridA*i)), xRightLimit/2));
+            snake.add(new Point((520), 320-(gridA*i)));
         }
     }
-
+    
     /**
      * Draw a snake on the canvas.
      */
     public void drawSnake(Graphics2D g)
     {
-        //TODO göra en snyggare orm?
-
-        g.setColor(Color.red);
+    	//TODO göra en snyggare orm?
+    	
+    	g.setColor(Color.blue);
         for(Point p : snake)
         {
-            g.fillRect(p.x, p.y, gridA, gridA);
-            g.setColor(Color.DARK_GRAY);
+        	g.fillRect(p.x, p.y, gridA, gridA);
+        	g.setColor(Color.DARK_GRAY);
         }
-        g.setColor(Color.BLACK);
+    	//g.setColor(Color.PINK);
     }
+    
+    public void snakeDraw(Graphics2D g, Image body, Image leftHead, Image upHead, Image rightHead, Image downHead)
+    {
+    	boolean headDrawn = false; //check if head has been drawn.
+    	//draw head
+    	switch (direction) {
+        	case UNINITIALIZED:
+        		g.drawImage(downHead, snake.getFirst().x, snake.getFirst().y, gridA, gridA, null);
+        		break;
+        	case WEST:
+        		g.drawImage(leftHead, snake.getFirst().x, snake.getFirst().y, gridA, gridA, null);
+        		break;
+        	case NORTH:
+        		g.drawImage(upHead, snake.getFirst().x, snake.getFirst().y, gridA, gridA, null);
+        		break;
+        	case EAST:
+        		g.drawImage(rightHead, snake.getFirst().x, snake.getFirst().y, gridA, gridA, null);
+        		break;
+        	case SOUTH:
+        		g.drawImage(downHead, snake.getFirst().x, snake.getFirst().y, gridA, gridA, null);
+        		break;
+    	}
+    	//draw body
+       	for(Point p : snake)
+       	{
+       		if(headDrawn) { //skip first	
+       		g.drawImage(body, p.x, p.y, gridA, gridA, null);
+       		}
+       		headDrawn = true;
+       	} 	
+    }
+
 
     /**
      * Change direction of the snake.
@@ -106,80 +148,99 @@ public class Snake
     {
         direction = changeD;
     }
-
+    
     /**
      * Move the snake.
      */
-    public void move()
+    public void move() 
     {
         Point head = snake.peek();
         Point nextPoint = head;
         switch (direction) {
             case UNINITIALIZED:
-            return;
+                return;
             case WEST:
-            nextPoint = new Point(head.x - gridA, head.y);
-            break;
+            	nextPoint = new Point(head.x - gridA, head.y);
+                break;
             case NORTH:
-            nextPoint = new Point(head.x, head.y - gridA);
-            break;
+                nextPoint = new Point(head.x, head.y - gridA);
+                break;
             case EAST:
-            nextPoint = new Point(head.x + gridA, head.y);
-            break;
+                nextPoint = new Point(head.x + gridA, head.y);
+                break;
             case SOUTH:
-            nextPoint = new Point(head.x, head.y + gridA);
-            break;
+                nextPoint = new Point(head.x, head.y + gridA);
+                break;
         }
+        firstMoveDone = true;
+        keyDone = true;
         //remove tail
         snake.removeLast();
-
-        //check if out of bounds or if there is food on current coordinate.
+        
+        //check if out of bounds or if there is food on current cordinate.
         if(nextPoint.x < xLeftLimit || nextPoint.x >= xRightLimit) {
             //TODO GAME OVER
-            gameOn = false;
+        	gameOn = false;
             System.out.println("x == OOB");
             JOptionPane.showMessageDialog(null, "Game over!");
             fixHighScore();
             //System.exit(0);
         }else if(nextPoint.y < yTopLimit || nextPoint.y >= yLowLimit ) {
             //TODO GAME OVER
-            gameOn = false;
+        	gameOn = false;
             System.out.println("y == OOB");
             JOptionPane.showMessageDialog(null, "Game over!");
             fixHighScore();
             //System.exit(0);
         }else if(snake.contains(nextPoint)) {
             //TODO GAME OVER
-            gameOn = false;
-            System.out.println("Snake SMASH");
-            JOptionPane.showMessageDialog(null, "Game over!");
-            fixHighScore();
-            //System.exit(0);
+        	gameOn = false;
+        	System.out.println("Snake SMASH");
+        	JOptionPane.showMessageDialog(null, "Game over!");
+        	fixHighScore();
+        	//System.exit(0);
         }else if(nextPoint.equals(food)) {
-            eat();
-            generateFood();
+        	eat();
+        	generateFood();
         }
-        snake.push(nextPoint);
+        snake.push(nextPoint); 
     }
-
+    
+    public boolean getKeyDone()
+    {
+    	return keyDone;
+    }
+    
+    public void setKeyDone(boolean done)
+    {
+    	keyDone = done;
+    }
+    
+    public boolean getFirstMoveDone()
+    {
+    	return firstMoveDone;
+    }
+    
     /**
      * return the direction of the snake.
      */
     public Direction getDirection()
     {
-        return direction;
+    	return direction;
     }
-
+    
     /**
      * kill the snake?
-     *
+     * 
      * @param gameReallyOn
      */
     public boolean getGameOn()
     {
-        return gameOn;
+    	return gameOn;
     }
-
+    
+    
+    
     
     
     
@@ -190,25 +251,25 @@ public class Snake
      */
     private void generateFood()
     {
-        int xRight = xRightLimit/gridA;
-        int xLeft = xLeftLimit/gridA;
-        int yLow = yLowLimit/gridA;
-        int yTop = yTopLimit/gridA;
-
-        Random rand = new Random();
-        int randX = (rand.nextInt(xRight - xLeft) + xLeft) * gridA;
-        int randY = (rand.nextInt(yLow - yTop) + yTop) * gridA;
-        Point nextPoint = new Point(randX, randY);
-        //check if the new generated point is in the snake
-        while(snake.contains(nextPoint))
-        {
-            randX = (rand.nextInt(xRight - xLeft) + xLeft) * gridA;
-            randY = (rand.nextInt(yLow - yTop) + yTop) * gridA;
-            nextPoint = new Point(randX, randY);
-        }
-        food = nextPoint;
+    	int xRight = xRightLimit/gridA;
+    	int xLeft = xLeftLimit/gridA;
+    	int yLow = yLowLimit/gridA;
+    	int yTop = yTopLimit/gridA;
+    	
+    	Random rand = new Random();
+    	int randX = (rand.nextInt(xRight - xLeft) + xLeft) * gridA;
+    	int randY = (rand.nextInt(yLow - yTop) + yTop) * gridA;
+    	Point nextPoint = new Point(randX, randY);
+    	//check if the new generated point is in the snake
+    	while(snake.contains(nextPoint))
+    	{
+    		randX = (rand.nextInt(xRight - xLeft) + xLeft) * gridA;
+        	randY = (rand.nextInt(yLow - yTop) + yTop) * gridA;
+    		nextPoint = new Point(randX, randY);
+    	}
+    	food = nextPoint;
     }
-
+    
     /**
      * eat food and grow
      */
@@ -218,25 +279,31 @@ public class Snake
         if(snakeSpeed >= 200 )
             incrementScore(10);
         else if (snakeSpeed >= 50){
-            incrementScore(20);    	 
+            incrementScore(20);
         }
         else{
             incrementScore(30);
 
         }
     }
-
+    
     /**
      * Draw a foodpoint on the canvas.
      */
     public void drawFood(Graphics2D g)
     {
-        //TODO rita snyggare mat?
-        g.setColor(Color.green);
+    	//TODO rita snyggare mat?
+    	g.setColor(Color.green);
         g.fillOval(food.x, food.y, gridA, gridA);
-        g.setColor(Color.BLACK);
+    	g.setColor(Color.BLACK);
+    }
+    
+    public void foodDraw(Graphics2D g, Image snakeFood)
+    {	
+    	g.drawImage(snakeFood, food.x, food.y, gridA, gridA, null);  	
     }
 
+    
     
     /**
      * Draw score on canvas.
@@ -244,33 +311,36 @@ public class Snake
      */
     public void drawScore(Graphics2D g)
     {
-        g.drawString("Your Score: " + score, xLeftLimit, yTopLimit-gridA);
-        g.drawString("Highscore: " + highScore, xLeftLimit+12*gridA, yTopLimit-gridA);
+    	g.setFont(new Font("Aharoni", Font.BOLD, 28));
+    	g.drawString("Score: " + score, xLeftLimit, yTopLimit-10);
+    	g.drawString("Highscore: " + highScore, xLeftLimit+10*gridA, yTopLimit-10);
+    	
     }
 
+    
     /**
      * increment score.
      */
     public void incrementScore(int plus)
     {
-        score += plus;
+    	score += plus;
     }
-
+    
     /**
      * return score
      */
     public int getScore()
-    {
-        return score;
+    { 
+    	return score;
     }
-
+    
     public void fixHighScore(){
         Boolean notAdded = true;
         if (score > highScoreFile.getHighScoreInt(0)){
             String s = JOptionPane.showInputDialog("New High Score! \n Please write your Name");
-        	if(s == null || s == "-1")
-        		s = "noName";
-        	if(s.length() == 0 )
+         if(s == null)
+         s = "noName";
+         if(s.length() == 0 )
                 s = "noName";
             highScoreFile.writeToFile(s, score);
         }
@@ -280,34 +350,34 @@ public class Snake
                 if(highScoreArray[i] != null){
                     if (score > highScoreFile.getHighScoreInt(i)){
                         
-                    	String s = JOptionPane.showInputDialog("Top 10! \n Please write your Name");
-                    	//System.out.println(s);
-                    	if(s == null)
-                    		s = "noName";
-                    	if(s.length() == 0 )
+                     String s = JOptionPane.showInputDialog("Top 10! \n Please write your Name");
+                     //System.out.println(s);
+                     if(s == null)
+                     s = "noName";
+                     if(s.length() == 0 )
                             s = "noName";
                         //System.out.println(s + score);
                         highScoreFile.writeToFile(s.replaceAll("\\s+",""), score);
                         notAdded = false;
                     }
 
-    		    				
+    
                 }
                 else if (highScoreArray[i] == null){
                     String s = JOptionPane.showInputDialog("Top 10! \n Please write your Name");
                     
-                	if(s == null)
-                		s = "noName";
-                	if(s.length() == 0 )
+                 if(s == null)
+                 s = "noName";
+                 if(s.length() == 0 )
                         s = "noName";
                     //System.out.println(s + score);
                     highScoreFile.writeToFile(s.replaceAll("\\s+",""), score);
-                    notAdded = false;	
+                    notAdded = false;
 
                 }
 
             }
         }
     }
-
+    
 }
